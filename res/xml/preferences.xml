@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <EditTextPreference android:summary="@string/prefs_blobbox_ip_sum" android:title="@string/prefs_blobbox_ip_title" android:key="blobbox_ip" android:selectable="true" android:enabled="true" android:singleLine="true">  </EditTextPreference>
+  <EditTextPreference android:key="blobbox_username" android:title="@string/prefs_blobbox_username_title" android:enabled="true" android:summary="@string/prefs_blobbox_username_sum" android:selectable="true" android:singleLine="true">  </EditTextPreference>
+  <EditTextPreference android:key="blobbox_password" android:title="@string/prefs_blobbox_password_title" android:enabled="true" android:selectable="true" android:singleLine="true">  </EditTextPreference>
+  
+  
+  
+    
+    
+</PreferenceScreen>
