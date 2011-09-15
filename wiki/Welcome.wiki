@@ -6,11 +6,3 @@ Blobbox-remote is an Android application for BLOBbox owners. Find content using 
 You can also have the BLOBbox download content for later consumption.
 
 BLOBbox, myBlobbox, TVBLOB and the "b" logo are all registered trademarks of TVBLOB Srl.
-
-
-= Details =
-
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
