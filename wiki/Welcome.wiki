@@ -6,3 +6,5 @@ Blobbox-remote is an Android application for BLOBbox owners. Find content using 
 You can also have the BLOBbox download content for later consumption.
 
 BLOBbox, myBlobbox, TVBLOB and the "b" logo are all registered trademarks of TVBLOB Srl.
+
+Blobbox Remote is open source software by Paul Henshaw and Rodolfo Saccani.
