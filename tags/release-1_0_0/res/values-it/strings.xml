@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blobbox Remote</string>
+    <string name="prefs_blobbox_ip_title">Indirizzo IP della Blobbox</string>
+    <string name="prefs_blobbox_ip_sum">Per conoscere l\'IP attuale premi la CHIAVE INGLESE, poi SUPPORTO e DIAGNOSTICA.</string>
+    <string name="prefs_blobbox_username_title">Username</string>
+    <string name="prefs_blobbox_username_sum">Il nome utente per l\'accesso alla web console. Puoi lasciarlo vuoto se non lo hai configurato.</string>
+    <string name="prefs_blobbox_password_title">Password</string>
+    <string name="prefs_blobbox_lan_category_title">Configurazione LAN</string>
+    <string name="prefs_blobbox_lan_category_sum">Parametri per l\'accesso alla Blobbox da rete locale</string>
+    <string name="prefs_blobbox_saved">Modifica salvata</string>
+    <string name="intent_blobbox_play">Blobbox Play</string>
+    <string name="intent_blobbox_download">Blobbox Download</string>
+    <string name="msg_errore">ERRORE: </string>
+    <string name="msg_errore_toast">ERRORE: Sei sicuro di aver configurato i parametri corretti? La box è raggiungibile?</string>
+    <string name="msg_unsupported_intent">Scusa! Non siamo in grado di gestire questo contenuto.</string>
+    <string name="msg_unexpected_op_code">ERROR: unexpected operation code.  Per favore contatta gli autori.</string>        
+    <string name="msg_title_progressdialog">Blobbox</string>
+    <string name="msg_content_progressdialog">Solo un attimo...</string>
+    <string name="msg_completed_ok">Tutto OK, la Blobbox saluta e ringrazia</string>
+    <string name="prefs_error_sw_ver">Il software della Blobbox con ip %1$s è troppo vecchio, aggiornalo.</string>
+	<string name="prefs_error_not_blobbox">ERRORE: L\'IP %1$s non è una Blobbox. Controlla di aver inserito l\'IP corretto.</string>
+	<string name="prefs_error_not_reachable">Non riesco a comunicare con la Blobbox con IP %1$s. Controlla l\'indirizzo IP e la configurazione della Blobbox.</string>
+	<string name="prefs_error_auth">Errore di autenticazione, controlla username e password della Blobbox con IP %1$s.</string>
+	<string name="prefs_ok">Blobbox trovato con IP %1$s.</string>
+	<string name="info_button">Informazioni</string>
+	<string name="info_dismiss_button">Ok</string>
+	<string name="info_title">Informazioni</string>
+	<string name="info_text">Autori:\nPaul Henshaw\n   (paul.sl.henshaw@gmail.com)\nRodolfo Saccani\n   (rodolfo@saccani.net)\n\nBLOBbox, myBlobbox, TVBLOB ed il logo "b" sono marchi registrati da TVBLOB srl.</string>
+	<string name="tellme">Dimmelo</string>
+	<string name="no_thanks">No grazie</string>	
+	<string name="what_is_blobbox">Che cos\'è la Blobbox?</string>
+
+</resources>
