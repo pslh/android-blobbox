@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="com.tvblob.fandango.myblobbox" 
+	android:versionCode="2" 
+	android:versionName="1.0.1"
+	android:installLocation="auto">
+	<uses-sdk android:minSdkVersion="4" />
+	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+	<application android:icon="@drawable/icon" android:label="@string/app_name"
+		android:allowClearUserData="true" android:debuggable="false">
+		<activity android:name="Configure" >
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN"></action>
+				<category android:name="android.intent.category.LAUNCHER"></category>
+			</intent-filter>
+		</activity>
+
+		<activity android:name="PlaybackMedia">
+			<intent-filter android:label="@string/intent_blobbox_play">
+				<action android:name="android.intent.action.SEND"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<data android:mimeType="text/plain"></data>
+			</intent-filter>
+
+			<intent-filter android:label="@string/intent_blobbox_play">
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<!-- <category android:name="android.intent.category.BROWSABLE" /> -->
+				<data android:mimeType="video/*" android:host="*"
+					android:scheme="http" />
+				<data android:mimeType="video/*" android:host="*"
+					android:scheme="https" />
+				<data android:mimeType="audio/*" android:host="*"
+					android:scheme="http" />
+				<data android:mimeType="audio/*" android:host="*"
+					android:scheme="https" />
+			</intent-filter>
+
+			<intent-filter android:label="@string/intent_blobbox_play">
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:host="www.youtube.com" android:scheme="http" />
+				<data android:host="www.youtube.com" android:scheme="https" />
+				<data android:host="m.youtube.com" android:scheme="http" />
+				<data android:host="m.youtube.com" android:scheme="https" />
+			</intent-filter>
+		</activity>
+
+		<activity android:name=".DownloadMedia">
+			<intent-filter android:label="@string/intent_blobbox_download">
+				<action android:name="android.intent.action.SEND"></action>
+				<category android:name="android.intent.category.DEFAULT"></category>
+				<data android:mimeType="text/plain"></data>
+			</intent-filter>
+
+			<intent-filter android:label="@string/intent_blobbox_download">
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<!-- <category android:name="android.intent.category.BROWSABLE" /> -->
+				<data android:mimeType="*/*" android:host="*" android:scheme="http" />
+				<data android:mimeType="*/*" android:host="*" android:scheme="https" />
+			</intent-filter>
+		</activity>
+
+	</application>
+</manifest>
