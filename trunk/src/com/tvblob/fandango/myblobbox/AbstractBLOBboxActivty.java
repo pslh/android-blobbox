@@ -1,5 +1,6 @@
 package com.tvblob.fandango.myblobbox;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.StringTokenizer;
@@ -28,12 +29,8 @@ import com.tvblob.fandango.argo.ArgoException;
  * @cvsid $Id$
  */
 public abstract class AbstractBLOBboxActivty extends Activity {
+	private static final String YOUTUBE_PLAY_URL = "http://tvportal.tvblob.com/apps/youtube/app.php?vid=";
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see android.app.Activity#onCreate(android.os.Bundle)
-	 */
 	// Debugging 
 	protected static final String TAG = "BLOBbox";
 	protected static final boolean DEBUG = true;
@@ -292,13 +289,13 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	}
 
 	/**
-	 * Return a URL to pass to BLOBbox browser bloblet in order to play the
-	 * given YouTube url.  Returns null if url is NOT a youtube watch link.
+	 * Return the YouTube video id of the film referred to by url.
+	 * Returns null if url is NOT a youtube watch link.
 	 * 
 	 * @param url
 	 * @return String
 	 */
-	public static String getYouTubeURL(final String url) {
+	public static String getYouTubeVideoID(final String url) {
 		/*
 		 * YouTube link
 		 *  http://www.youtube.com/watch?v=25AuClGJB0M&feature=topvideos_music
@@ -307,53 +304,88 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		 */
 
 		try {
-			final URL theURL = new URL(url);
-
-			if (DEBUG) {
-				Log.i(TAG, "host = " + theURL.getHost());
-			}
-
-			if (!"www.youtube.com".equals(theURL.getHost())
-					&& !"m.youtube.com".equals(theURL.getHost())) {
-				return null;
-			}
-			if (DEBUG) {
-				Log.i(TAG, "path = " + theURL.getPath());
-			}
-
-			if (!"/watch".equals(theURL.getPath())) {
+			if (!isYouTubeHost(url)) {
 				return null;
 			}
 
-			if (DEBUG) {
-				Log.i(TAG, "query = " + theURL.getQuery());
+			final String query = extractQuery(url);
+			if (query == null) {
+				return null;
 			}
+			final String videoID = findVideoIDInQuery(query);
 
-			final StringTokenizer tokenizer = new StringTokenizer(
-					theURL.getQuery(), "&=");
-			while (tokenizer.hasMoreTokens()) {
-				final String name = tokenizer.nextToken();
-				final String value = tokenizer.hasMoreTokens() ? tokenizer
-						.nextToken() : "";
-
-				if (DEBUG) {
-					Log.i(TAG, "QUERY: " + name + "==" + value);
-				}
-
-				if ("v".equals(name)) {
-					return "http://tvportal.tvblob.com/apps/youtube/app.php?vid="
-							+ value;
-				}
+			if (videoID == null) {
+				return null;
 			}
-
-			if (DEBUG) {
-				Log.i(TAG, "!!! failed to find v in query");
-			}
-
-			return null;
-
+			return videoID;
 		} catch (final Exception exception) {
 			return null;
 		}
+	}
+
+	/**
+	 * True iff url host in the youtube domain
+	 * 
+	 * @param url
+	 * @return boolean
+	 * @throws MalformedURLException 
+	 */
+	public static boolean isYouTubeHost(final String url)
+			throws MalformedURLException {
+		return new URL(url).getHost().endsWith(".youtube.com");
+	}
+
+	/**
+	 * URL to play YouTube video or null if NOT a youtube url
+	 * 
+	 * @param url
+	 * @return String
+	 */
+	public static String getYouTubeURL(final String url) {
+		final String id = getYouTubeVideoID(url);
+		return id == null ? null : YOUTUBE_PLAY_URL + id;
+	}
+
+	/**
+	 * Extract the query part of the url NOTE we do NOT use URL.getQuery() 
+	 * since this does not handle cases such as /index?url=...#/watch=?v=...
+	 * 
+	 * @param url
+	 * @return String
+	 */
+	public static String extractQuery(final String url) {
+		final int index = url.lastIndexOf('?');
+		if (index < 0 || index == url.length()) {
+			return null;
+		}
+		return url.substring(index + 1);
+	}
+
+	/**
+	 * The video id in the url query or null if not found
+	 * 
+	 * @param query
+	 * @return String
+	 */
+	public static String findVideoIDInQuery(final String query) {
+		if (DEBUG) {
+			Log.i(TAG, "findVideoIDInQuery: query = " + query);
+		}
+
+		final StringTokenizer tokenizer = new StringTokenizer(query, "&=");
+		while (tokenizer.hasMoreTokens()) {
+			final String name = tokenizer.nextToken();
+			final String value = tokenizer.hasMoreTokens() ? tokenizer
+					.nextToken() : "";
+
+			if (DEBUG) {
+				Log.i(TAG, "findVideoIDInQuery QUERY: " + name + "==" + value);
+			}
+
+			if ("v".equals(name)) {
+				return value;
+			}
+		}
+		return null;
 	}
 }
