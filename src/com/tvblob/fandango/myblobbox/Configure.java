@@ -99,9 +99,6 @@ public class Configure extends PreferenceActivity implements
 	public void onResume() {
 		super.onResume();
 
-		PreferenceManager.getDefaultSharedPreferences(this)
-		.registerOnSharedPreferenceChangeListener(this);
-
 		final String ip = PreferenceManager.getDefaultSharedPreferences(
 				getBaseContext()).getString(IPreferenceConstants.IP_PREF, "");
 
@@ -195,14 +192,8 @@ public class Configure extends PreferenceActivity implements
 
 				});
 
-	}
-
-	
-	@Override
-	protected void onPause() {
-		super.onPause();
 		PreferenceManager.getDefaultSharedPreferences(this)
-		.unregisterOnSharedPreferenceChangeListener(this);
+				.registerOnSharedPreferenceChangeListener(this);
 	}
 
 	/* (non-Javadoc)
