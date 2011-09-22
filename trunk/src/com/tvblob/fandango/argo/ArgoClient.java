@@ -90,18 +90,18 @@ public class ArgoClient {
 	}
 
 	/**
-	 * @param ipAddress2
-	 * @param userName2
-	 * @param password2
-	 * @param ipAddress2 
+	 * @param ipAddress
+	 * @param userName
+	 * @param password
+	 * @param ipAddress 
 	 * @throws JSONRPCException 
 	 * @throws UnsupportedEncodingException 
 	 * @throws NoSuchAlgorithmException 
 	 */
 	private static void login(final JabsorbRPCClient client,
-			final String userName2, final String password2,
-			final String ipAddress2) throws JSONRPCException,
-			NoSuchAlgorithmException, UnsupportedEncodingException {
+			final String userName, final String password, final String ipAddress)
+			throws JSONRPCException, NoSuchAlgorithmException,
+			UnsupportedEncodingException {
 		final String auth_user_name = client
 				.callString("authenticationManager.getAuthorizedUserName");
 
@@ -118,17 +118,17 @@ public class ArgoClient {
 			}
 			final String challenge = client.callString(
 					"authenticationManager.getLoginChallenge",
-					new Object[] { userName2 });
+					new Object[] { userName });
 
 			final String digest = BLOBboxEncryptionUtils
 					.getEncryptedMessageDigestAsString(challenge + ':'
-							+ userName2 + ':' + password2);
+							+ userName + ':' + password);
 
 			client.callString("authenticationManager.login",
 					new Object[] { digest });
 
 			// Need to repeat setup - list of methods has changed
-			client.performPost(getArgoURL(ipAddress2));
+			client.performPost(getArgoURL(ipAddress));
 
 			if (DEBUG) {
 				Log.i(TAG, "challenge: " + challenge.toString());
