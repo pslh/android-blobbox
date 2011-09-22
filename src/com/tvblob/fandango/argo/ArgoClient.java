@@ -29,6 +29,9 @@ public class ArgoClient {
 	private static final int MIN_PH_VERSION_NUM = StringUtilities
 			.getCompoundVersionNumber("1.64.10");
 
+	private static final int MIN_QTB_VERSION_NUM = StringUtilities
+			.getCompoundVersionNumber("1.63.19");
+
 	private static final String TAG = "ArgoClient";
 	private static final boolean DEBUG = true;
 
@@ -223,7 +226,10 @@ public class ArgoClient {
 		final int versionNum = StringUtilities
 				.getCompoundVersionNumber(version);
 		return versionNum >= MIN_VERSION_NUM
-				|| versionNum >= MIN_PH_VERSION_NUM && version.contains(".PH.");
+				|| versionNum >= MIN_PH_VERSION_NUM && version.contains(".PH.")
+				|| versionNum >= MIN_QTB_VERSION_NUM
+				&& version.contains(".QTB.");
+
 	}
 
 	/**

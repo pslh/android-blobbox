@@ -9,6 +9,7 @@ import org.alexd.jsonrpc.JSONRPCException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -18,8 +19,12 @@ import android.util.Log;
 import android.webkit.MimeTypeMap;
 import android.widget.Toast;
 
+import com.tvblob.fandango.argo.ArgoAuthenticationException;
 import com.tvblob.fandango.argo.ArgoClient;
+import com.tvblob.fandango.argo.ArgoCommunicationException;
 import com.tvblob.fandango.argo.ArgoException;
+import com.tvblob.fandango.argo.IncompatibleRemoteDeviceException;
+import com.tvblob.fandango.argo.IncompatibleSoftwareVersionException;
 
 /**
  * Abstract base for {@link Activity} classes which use the BLOBbox 
@@ -38,6 +43,11 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	private static final int OPERATION_OK = 0;
 	private static final int OPERATION_FAILED = 1;
 	private static final int UNSUPPORTED_INTENT = 2;
+	private static final int VERSION_FAIL = 3;
+
+	private static final int AUTH_FAIL = 4;
+	private static final int REMOTE_FAIL = 5;
+	private static final int COMMS_FAIL = 6;
 
 	private Handler handler = null;
 
@@ -70,32 +80,44 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 			 * @see android.os.Handler#handleMessage(android.os.Message)
 			 */
 			public void handleMessage(final Message msg) {
+				final Context context = getApplicationContext();
+
 				switch (msg.what) {
 				case OPERATION_OK:
-					Toast.makeText(getApplicationContext(),
-							getString(R.string.msg_completed_ok),
-							Toast.LENGTH_LONG).show();
+					showOK(context);
 					break;
 
 				case OPERATION_FAILED:
-					Toast.makeText(getApplicationContext(),
-							getString(R.string.msg_errore_toast),
-							Toast.LENGTH_LONG).show();
+					showOpFailedError(context);
 
 					break;
 
 				case UNSUPPORTED_INTENT:
-					Toast.makeText(getApplicationContext(),
-							getString(R.string.msg_unsupported_intent),
-							Toast.LENGTH_LONG).show();
+					showUnsupportedIntentError(context);
+
+					break;
+
+				case VERSION_FAIL:
+					showVersionError(context);
+
+					break;
+
+				case AUTH_FAIL:
+					showError(getAuthError(getIP()));
+					break;
+
+				case COMMS_FAIL:
+					showError(getCommsError(getIP()));
+
+					break;
+
+				case REMOTE_FAIL:
+					showError(getRemoteError(getIP()));
 
 					break;
 
 				default:
-					Toast.makeText(
-							getApplicationContext(),
-							getString(R.string.msg_unexpected_op_code) + " "
-									+ msg.what, Toast.LENGTH_LONG).show();
+					showUnexpectedCodeError(msg, context);
 
 				}
 				finish();
@@ -148,6 +170,14 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 					getPassword());
 			performOperation(intent, client);
 			handler.sendEmptyMessage(OPERATION_OK);
+		} catch (final IncompatibleRemoteDeviceException exception) {
+			handler.sendEmptyMessage(REMOTE_FAIL);
+		} catch (final IncompatibleSoftwareVersionException exception) {
+			handler.sendEmptyMessage(VERSION_FAIL);
+		} catch (final ArgoCommunicationException exception) {
+			handler.sendEmptyMessage(COMMS_FAIL);
+		} catch (final ArgoAuthenticationException exception) {
+			handler.sendEmptyMessage(AUTH_FAIL);
 		} catch (final ArgoUnsupportedIntentException exception) {
 			exception.printStackTrace();
 			handler.sendEmptyMessage(UNSUPPORTED_INTENT);
@@ -388,4 +418,83 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		}
 		return null;
 	}
+
+	/**
+	 * PACKAGE PRIVATE - used by handler
+	 * 
+	 * @param error
+	 */
+	void showError(final String error) {
+		Toast.makeText(getBaseContext(), error, Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * @param msg
+	 * @param context
+	 */
+	void showUnexpectedCodeError(final Message msg, final Context context) {
+		Toast.makeText(context,
+				getString(R.string.msg_unexpected_op_code) + " " + msg.what,
+				Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * @param context
+	 */
+	void showOpFailedError(final Context context) {
+		Toast.makeText(context, getString(R.string.msg_errore_toast),
+				Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * @param context
+	 */
+	void showUnsupportedIntentError(final Context context) {
+		Toast.makeText(context, getString(R.string.msg_unsupported_intent),
+				Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * @param context
+	 */
+	void showVersionError(final Context context) {
+		Toast.makeText(context,
+				String.format(getString(R.string.prefs_error_sw_ver), getIP()),
+				Toast.LENGTH_LONG).show();
+	}
+
+	/**
+	 * @param context
+	 */
+	void showOK(final Context context) {
+		Toast.makeText(context, getString(R.string.msg_completed_ok),
+				Toast.LENGTH_SHORT).show();
+	}
+
+	/**
+	 * @param ipAddress
+	 * @return String
+	 */
+	String getRemoteError(final String ipAddress) {
+		return String.format(getString(R.string.prefs_error_not_blobbox),
+				ipAddress);
+	}
+
+	/**
+	 * @param ipAddress
+	 * @return String
+	 */
+	String getCommsError(final String ipAddress) {
+		return String.format(getString(R.string.prefs_error_not_reachable),
+				ipAddress);
+	}
+
+	/**
+	 * @param ipAddress
+	 * @return String
+	 */
+	String getAuthError(final String ipAddress) {
+		return String.format(getString(R.string.prefs_error_auth), ipAddress);
+	}
+
 }
