@@ -9,15 +9,12 @@ import org.alexd.jsonrpc.JSONRPCException;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
-import android.widget.Toast;
 
 import com.tvblob.fandango.argo.ArgoAuthenticationException;
 import com.tvblob.fandango.argo.ArgoClient;
@@ -33,21 +30,11 @@ import com.tvblob.fandango.argo.IncompatibleSoftwareVersionException;
  * @created Sep 8, 2011
  * @cvsid $Id$
  */
-public abstract class AbstractBLOBboxActivty extends Activity {
+public abstract class AbstractBLOBboxActivity extends Activity {
 	private static final String YOUTUBE_PLAY_URL = "http://tvportal.tvblob.com/apps/youtube/app.php?vid=";
 
 	// Debugging 
 	protected static final String TAG = "BLOBbox";
-	protected static final boolean DEBUG = true;
-
-	private static final int OPERATION_OK = 0;
-	private static final int OPERATION_FAILED = 1;
-	private static final int UNSUPPORTED_INTENT = 2;
-	private static final int VERSION_FAIL = 3;
-
-	private static final int AUTH_FAIL = 4;
-	private static final int REMOTE_FAIL = 5;
-	private static final int COMMS_FAIL = 6;
 
 	private Handler handler = null;
 
@@ -74,55 +61,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		super.onCreate(savedInstanceState);
 
 		// Progress dialog: handler must check operation status and then finish
-		handler = new Handler() {
-
-			/* (non-Javadoc)
-			 * @see android.os.Handler#handleMessage(android.os.Message)
-			 */
-			public void handleMessage(final Message msg) {
-				final Context context = getApplicationContext();
-
-				switch (msg.what) {
-				case OPERATION_OK:
-					showOK(context);
-					break;
-
-				case OPERATION_FAILED:
-					showOpFailedError(context);
-
-					break;
-
-				case UNSUPPORTED_INTENT:
-					showUnsupportedIntentError(context);
-
-					break;
-
-				case VERSION_FAIL:
-					showVersionError(context);
-
-					break;
-
-				case AUTH_FAIL:
-					showError(getAuthError(getIP()));
-					break;
-
-				case COMMS_FAIL:
-					showError(getCommsError(getIP()));
-
-					break;
-
-				case REMOTE_FAIL:
-					showError(getRemoteError(getIP()));
-
-					break;
-
-				default:
-					showUnexpectedCodeError(msg, context);
-
-				}
-				finish();
-			}
-		};
+		handler = new ArgoOperationHandler(getIP(), this);
 
 		// Android intent handling
 		final Intent intent = getIntent();
@@ -140,7 +79,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 					setupClientAndPerformOperation(intent);
 				} catch (final Exception exception) {
 					exception.printStackTrace();
-					if (DEBUG) {
+					if (Constants.DEBUG) {
 						Log.e(TAG, "onCreate.run: " + exception.toString());
 					}
 				} finally {
@@ -160,7 +99,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	 * @param intent
 	 */
 	void setupClientAndPerformOperation(final Intent intent) {
-		if (DEBUG) {
+		if (Constants.DEBUG) {
 			Log.i(TAG, "action: " + intent.getAction());
 			Log.i(TAG, "type: " + intent.getType());
 		}
@@ -169,25 +108,25 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 			final ArgoClient client = new ArgoClient(getIP(), getUserName(),
 					getPassword());
 			performOperation(intent, client);
-			handler.sendEmptyMessage(OPERATION_OK);
+			handler.sendEmptyMessage(Constants.OPERATION_OK);
 		} catch (final IncompatibleRemoteDeviceException exception) {
-			handler.sendEmptyMessage(REMOTE_FAIL);
+			handler.sendEmptyMessage(Constants.INCOMPATIBLE_DEVICE);
 		} catch (final IncompatibleSoftwareVersionException exception) {
-			handler.sendEmptyMessage(VERSION_FAIL);
+			handler.sendEmptyMessage(Constants.UNSUPPORTED_VERSION);
 		} catch (final ArgoCommunicationException exception) {
-			handler.sendEmptyMessage(COMMS_FAIL);
+			handler.sendEmptyMessage(Constants.COMMUNICATIONS_FAILED);
 		} catch (final ArgoAuthenticationException exception) {
-			handler.sendEmptyMessage(AUTH_FAIL);
+			handler.sendEmptyMessage(Constants.AUTHENTICATION_FAILED);
 		} catch (final ArgoUnsupportedIntentException exception) {
 			exception.printStackTrace();
-			handler.sendEmptyMessage(UNSUPPORTED_INTENT);
-			if (DEBUG) {
+			handler.sendEmptyMessage(Constants.UNSUPPORTED_INTENT);
+			if (Constants.DEBUG) {
 				Log.e(TAG, exception.toString());
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
-			handler.sendEmptyMessage(OPERATION_FAILED);
-			if (DEBUG) {
+			handler.sendEmptyMessage(Constants.OPERATION_FAILED);
+			if (Constants.DEBUG) {
 				Log.e(TAG, e.toString());
 			}
 		}
@@ -200,7 +139,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	 */
 	protected String getPassword() {
 		return PreferenceManager.getDefaultSharedPreferences(getBaseContext())
-				.getString(IPreferenceConstants.PASSWORD_PREF, "");
+				.getString(Constants.PASSWORD_PREF, "");
 	}
 
 	/**
@@ -211,7 +150,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	 */
 	protected String getUserName() {
 		return PreferenceManager.getDefaultSharedPreferences(getBaseContext())
-				.getString(IPreferenceConstants.USERNAME_PREF, "");
+				.getString(Constants.USERNAME_PREF, "");
 	}
 
 	/**
@@ -221,7 +160,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	 */
 	protected String getIP() {
 		return PreferenceManager.getDefaultSharedPreferences(getBaseContext())
-				.getString(IPreferenceConstants.IP_PREF, "");
+				.getString(Constants.IP_PREF, "");
 	}
 
 	/**
@@ -239,7 +178,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		if (dataString == null) {
 			final Bundle extras = intent.getExtras();
 			if (extras == null) {
-				if (DEBUG) {
+				if (Constants.DEBUG) {
 					Log.i(TAG, "getURL: no data and no extras in intent "
 							+ intent.toString());
 					return null;
@@ -277,7 +216,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		 * If no EXTRAs we can trust the mime type in Intent
 		 */
 		if (intent.getExtras() == null) {
-			if (DEBUG) {
+			if (Constants.DEBUG) {
 				Log.i(TAG, "No Extras, using intent type " + intent.getType());
 			}
 			return intent.getType();
@@ -290,7 +229,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 				.getMimeTypeFromExtension(
 						MimeTypeMap.getFileExtensionFromUrl(url));
 		if (mimeTypeFromExtension != null) {
-			if (DEBUG) {
+			if (Constants.DEBUG) {
 				Log.i(TAG, "mime from map " + mimeTypeFromExtension);
 			}
 			return mimeTypeFromExtension;
@@ -301,7 +240,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		 */
 		final String guessed = URLConnection.guessContentTypeFromName(url);
 		if (guessed != null) {
-			if (DEBUG) {
+			if (Constants.DEBUG) {
 				Log.i(TAG, "guessed type = " + guessed);
 			}
 			return guessed;
@@ -312,7 +251,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 		 */
 		final String lastguess = url.endsWith(".torrent") ? "application/x-bittorrent"
 				: intent.getType();
-		if (DEBUG) {
+		if (Constants.DEBUG) {
 			Log.i(TAG, "couldn't guess, using mime type = " + lastguess);
 		}
 		return lastguess;
@@ -398,7 +337,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 	 * @return String
 	 */
 	public static String findVideoIDInQuery(final String query) {
-		if (DEBUG) {
+		if (Constants.DEBUG) {
 			Log.i(TAG, "findVideoIDInQuery: query = " + query);
 		}
 
@@ -408,7 +347,7 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 			final String value = tokenizer.hasMoreTokens() ? tokenizer
 					.nextToken() : "";
 
-			if (DEBUG) {
+			if (Constants.DEBUG) {
 				Log.i(TAG, "findVideoIDInQuery QUERY: " + name + "==" + value);
 			}
 
@@ -417,84 +356,6 @@ public abstract class AbstractBLOBboxActivty extends Activity {
 			}
 		}
 		return null;
-	}
-
-	/**
-	 * PACKAGE PRIVATE - used by handler
-	 * 
-	 * @param error
-	 */
-	void showError(final String error) {
-		Toast.makeText(getBaseContext(), error, Toast.LENGTH_LONG).show();
-	}
-
-	/**
-	 * @param msg
-	 * @param context
-	 */
-	void showUnexpectedCodeError(final Message msg, final Context context) {
-		Toast.makeText(context,
-				getString(R.string.msg_unexpected_op_code) + " " + msg.what,
-				Toast.LENGTH_LONG).show();
-	}
-
-	/**
-	 * @param context
-	 */
-	void showOpFailedError(final Context context) {
-		Toast.makeText(context, getString(R.string.msg_errore_toast),
-				Toast.LENGTH_LONG).show();
-	}
-
-	/**
-	 * @param context
-	 */
-	void showUnsupportedIntentError(final Context context) {
-		Toast.makeText(context, getString(R.string.msg_unsupported_intent),
-				Toast.LENGTH_LONG).show();
-	}
-
-	/**
-	 * @param context
-	 */
-	void showVersionError(final Context context) {
-		Toast.makeText(context,
-				String.format(getString(R.string.prefs_error_sw_ver), getIP()),
-				Toast.LENGTH_LONG).show();
-	}
-
-	/**
-	 * @param context
-	 */
-	void showOK(final Context context) {
-		Toast.makeText(context, getString(R.string.msg_completed_ok),
-				Toast.LENGTH_SHORT).show();
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	String getRemoteError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_not_blobbox),
-				ipAddress);
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	String getCommsError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_not_reachable),
-				ipAddress);
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	String getAuthError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_auth), ipAddress);
 	}
 
 }
