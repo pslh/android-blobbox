@@ -14,7 +14,7 @@ import com.tvblob.fandango.argo.ArgoException;
  * @created Sep 6, 2011
  * @cvsid $Id$
  */
-public class PlaybackMedia extends AbstractBLOBboxActivty {
+public class PlaybackMedia extends AbstractBLOBboxActivity {
 
 	/* (non-Javadoc)
 	 * @see com.rsaccani.android.blobbox.AbstractBLOBboxActivty#performOperation(android.widget.TextView, android.content.Intent, org.alexd.jsonrpc.JSONRPCHttpClient)
@@ -29,14 +29,14 @@ public class PlaybackMedia extends AbstractBLOBboxActivty {
 		final String youTubeURL = getYouTubeURL(url);
 		if (youTubeURL == null) {
 			// NOT YouTube - open in player
-			if (DEBUG) {
+			if (Constants.DEBUG) {
 				Log.i(TAG, "performOperation: calling playURI " + url);
 			}
 			client.playURI(url, "From Android", "Playing " + url
 					+ " from Android");
 		} else {
 			// YouTube - open in browser
-			if (DEBUG) {
+			if (Constants.DEBUG) {
 				Log.i(TAG, "performOperation: YouTube URI: " + youTubeURL);
 			}
 			client.browseURL(youTubeURL);

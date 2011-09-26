@@ -12,7 +12,7 @@ import com.tvblob.fandango.argo.ArgoException;
  * @created Sep 8, 2011
  * @cvsid $Id$
  */
-public class DownloadMedia extends AbstractBLOBboxActivty {
+public class DownloadMedia extends AbstractBLOBboxActivity {
 
 	/* (non-Javadoc)
 	 * @see com.rsaccani.android.blobbox.AbstractBLOBboxActivty#performOperation(android.widget.TextView, android.content.Intent, org.alexd.jsonrpc.JSONRPCHttpClient)

@@ -10,14 +10,12 @@ import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.Message;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.tvblob.fandango.argo.ArgoAuthenticationException;
 import com.tvblob.fandango.argo.ArgoClient;
@@ -37,73 +35,19 @@ public class Configure extends PreferenceActivity implements
 
 	private static final String BLOBBOX_URL = "http://www.blobbox.tv/?s=fandango";
 
-	private static final int CONFIG_OK = 0;
-	private static final int CONFIG_AUTH_FAIL = 1;
-	private static final int CONFIG_REMOTE_FAIL = 2;
-	private static final int CONFIG_VERSION_FAIL = 3;
-	private static final int CONFIG_COMMS_FAIL = 4;
-
-	/**
-	 * {@link Handler} to display {@link Toast} following termination of 
-	 * preference validation. 
-	 */
-	private final class ConfigValidationHandler extends Handler {
-		private final String ipAddress;
-
-		/**
-		 * PACKAGE PRIVATE
-		 * 
-		 * @param ipAddress
-		 */
-		ConfigValidationHandler(final String ipAddress) {
-			this.ipAddress = ipAddress;
-		}
-
-		/* (non-Javadoc)
-		 * @see android.os.Handler#handleMessage(android.os.Message)
-		 */
-		public void handleMessage(final Message msg) {
-			switch (msg.what) {
-			case CONFIG_OK:
-				showMessage(getOKMessage(ipAddress));
-				break;
-
-			case CONFIG_AUTH_FAIL:
-				showError(getAuthError(ipAddress));
-				break;
-
-			case CONFIG_COMMS_FAIL:
-				showError(getCommsError(ipAddress));
-
-				break;
-
-			case CONFIG_REMOTE_FAIL:
-				showError(getRemoteError(ipAddress));
-
-				break;
-
-			case CONFIG_VERSION_FAIL:
-				showError(getVersionError(ipAddress));
-
-				break;
-
-			default:
-				showError("Unexpected code: " + msg.what);
-
-			}
-		}
-	}
-
 	private Handler handler = null;
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onResume()
+	 */
 	public void onResume() {
 		super.onResume();
 
 		PreferenceManager.getDefaultSharedPreferences(this)
-		.registerOnSharedPreferenceChangeListener(this);
+				.registerOnSharedPreferenceChangeListener(this);
 
 		final String ip = PreferenceManager.getDefaultSharedPreferences(
-				getBaseContext()).getString(IPreferenceConstants.IP_PREF, "");
+				getBaseContext()).getString(Constants.IP_PREF, "");
 
 		// IP address field is empty, let's prompt the user for more information about BLOBbox
 		if (ip.length() == 0) {
@@ -140,6 +84,9 @@ public class Configure extends PreferenceActivity implements
 		return super.onCreateOptionsMenu(menu);
 	}
 
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onOptionsItemSelected(android.view.MenuItem)
+	 */
 	@Override
 	public boolean onOptionsItemSelected(final MenuItem item) {
 		super.onOptionsItemSelected(item);
@@ -179,7 +126,7 @@ public class Configure extends PreferenceActivity implements
 		addPreferencesFromResource(R.xml.preferences);
 
 		// Get the custom preference
-		final Preference blobbox_ip = findPreference(IPreferenceConstants.IP_PREF);
+		final Preference blobbox_ip = findPreference(Constants.IP_PREF);
 
 		blobbox_ip
 				.setOnPreferenceClickListener(new OnPreferenceClickListener() {
@@ -197,12 +144,14 @@ public class Configure extends PreferenceActivity implements
 
 	}
 
-	
+	/* (non-Javadoc)
+	 * @see android.app.Activity#onPause()
+	 */
 	@Override
 	protected void onPause() {
 		super.onPause();
 		PreferenceManager.getDefaultSharedPreferences(this)
-		.unregisterOnSharedPreferenceChangeListener(this);
+				.unregisterOnSharedPreferenceChangeListener(this);
 	}
 
 	/* (non-Javadoc)
@@ -210,18 +159,19 @@ public class Configure extends PreferenceActivity implements
 	 */
 	public void onSharedPreferenceChanged(
 			final SharedPreferences sharedPreferences, final String key) {
-		final String ipAddress = sharedPreferences.getString(
-				IPreferenceConstants.IP_PREF, null);
+		final String ipAddress = sharedPreferences.getString(Constants.IP_PREF,
+				null);
 
 		final String userName = sharedPreferences.getString(
-				IPreferenceConstants.USERNAME_PREF, null);
+				Constants.USERNAME_PREF, null);
 
 		final String password = sharedPreferences.getString(
-				IPreferenceConstants.PASSWORD_PREF, null);
+				Constants.PASSWORD_PREF, null);
 
-		handler = new ConfigValidationHandler(ipAddress);
+		//		handler = new ConfigValidationHandler(ipAddress, getBaseContext());
+		handler = new ValidatePreferencesArgoOperationHandler(ipAddress, this);
 
-		final ProgressDialog pd = ProgressDialog.show(this,
+		final ProgressDialog dialog = ProgressDialog.show(this,
 				getString(R.string.msg_title_progressdialog),
 				getString(R.string.msg_content_progressdialog), true);
 
@@ -230,7 +180,7 @@ public class Configure extends PreferenceActivity implements
 				try {
 					checkPrefs(ipAddress, userName, password);
 				} finally {
-					pd.dismiss();
+					dialog.dismiss();
 				}
 			}
 		}.start();
@@ -248,76 +198,16 @@ public class Configure extends PreferenceActivity implements
 			final String password) {
 		try {
 			new ArgoClient(ipAddress, userName, password);
-			handler.sendEmptyMessage(CONFIG_OK);
+			handler.sendEmptyMessage(Constants.OPERATION_OK);
 		} catch (final IncompatibleRemoteDeviceException exception) {
-			handler.sendEmptyMessage(CONFIG_REMOTE_FAIL);
+			handler.sendEmptyMessage(Constants.INCOMPATIBLE_DEVICE);
 		} catch (final IncompatibleSoftwareVersionException exception) {
-			handler.sendEmptyMessage(CONFIG_VERSION_FAIL);
+			handler.sendEmptyMessage(Constants.UNSUPPORTED_VERSION);
 		} catch (final ArgoCommunicationException exception) {
-			handler.sendEmptyMessage(CONFIG_COMMS_FAIL);
+			handler.sendEmptyMessage(Constants.COMMUNICATIONS_FAILED);
 		} catch (final ArgoAuthenticationException exception) {
-			handler.sendEmptyMessage(CONFIG_AUTH_FAIL);
+			handler.sendEmptyMessage(Constants.AUTHENTICATION_FAILED);
 		}
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	protected String getVersionError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_sw_ver), ipAddress);
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	protected String getRemoteError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_not_blobbox),
-				ipAddress);
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	protected String getCommsError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_not_reachable),
-				ipAddress);
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	String getAuthError(final String ipAddress) {
-		return String.format(getString(R.string.prefs_error_auth), ipAddress);
-	}
-
-	/**
-	 * @param ipAddress
-	 * @return String
-	 */
-	protected String getOKMessage(final String ipAddress) {
-		return String.format(getString(R.string.prefs_ok), ipAddress);
-	}
-
-	/**
-	 * PACKAGE PRIVATE - used by handler
-	 * 
-	 * @param error
-	 */
-	void showError(final String error) {
-		Toast.makeText(getBaseContext(), error, Toast.LENGTH_LONG).show();
-	}
-
-	/**
-	 * PACKAGE PRIVATE - used by handler
-	 * 
-	 * @param message
-	 */
-	void showMessage(final String message) {
-		Toast.makeText(getBaseContext(), message, Toast.LENGTH_SHORT).show();
 	}
 
 }
