@@ -30,14 +30,15 @@ public class PlaybackMedia extends AbstractBLOBboxActivity {
 		if (youTubeURL == null) {
 			// NOT YouTube - open in player
 			if (Constants.DEBUG) {
-				Log.i(TAG, "performOperation: calling playURI " + url);
+				Log.i(Constants.TAG, "performOperation: calling playURI " + url);
 			}
-			client.playURI(url, "From Android", "Playing " + url
-					+ " from Android");
+			client.playURI(url, getString(R.string.play_title),
+					String.format(getString(R.string.play_info), url));
 		} else {
 			// YouTube - open in browser
 			if (Constants.DEBUG) {
-				Log.i(TAG, "performOperation: YouTube URI: " + youTubeURL);
+				Log.i(Constants.TAG, "performOperation: YouTube URI: "
+						+ youTubeURL);
 			}
 			client.browseURL(youTubeURL);
 		}
