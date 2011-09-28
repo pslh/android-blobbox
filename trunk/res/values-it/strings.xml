@@ -26,9 +26,11 @@
 	<string name="info_button">Informazioni</string>
 	<string name="info_dismiss_button">Ok</string>
 	<string name="info_title">Informazioni</string>
-	<string name="info_text">Autori:\nPaul Henshaw\n   (paul.sl.henshaw@gmail.com)\nRodolfo Saccani\n   (rodolfo@saccani.net)\n\nBLOBbox, myBlobbox, TVBLOB ed il logo "b" sono marchi registrati da TVBLOB srl.</string>
+	<string name="info_text">Versione: %1$s\nAutori:\nPaul Henshaw\n   (paul.sl.henshaw@gmail.com)\nRodolfo Saccani\n   (rodolfo@saccani.net)\n\nBLOBbox, myBlobbox, TVBLOB ed il logo "b" sono marchi registrati da TVBLOB srl.</string>
 	<string name="tellme">Dimmelo</string>
 	<string name="no_thanks">No grazie</string>	
 	<string name="what_is_blobbox">Che cos\'è la Blobbox?</string>
+	<string name="play_title">Da Blobbox Remote</string>
+	<string name="play_info">Visualizzando %1$s da Blobbox Remote</string>
 
 </resources>

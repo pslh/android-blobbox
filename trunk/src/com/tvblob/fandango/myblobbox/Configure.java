@@ -7,6 +7,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,6 +16,7 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -97,7 +100,8 @@ public class Configure extends PreferenceActivity implements
 			final AlertDialog.Builder alertDialog = new AlertDialog.Builder(
 					this);
 			alertDialog.setTitle(getString(R.string.info_title));
-			alertDialog.setMessage(getString(R.string.info_text));
+			alertDialog.setMessage(String.format(getString(R.string.info_text),
+					getVersion()));
 			alertDialog.setNeutralButton(
 					getString(R.string.info_dismiss_button),
 					new DialogInterface.OnClickListener() {
@@ -114,6 +118,29 @@ public class Configure extends PreferenceActivity implements
 		}
 
 		return false;
+	}
+
+	/**
+	 * @return
+	 * @throws NameNotFoundException
+	 */
+	protected String getVersion() {
+		try {
+			return getPackageInfo().versionName;
+		} catch (final NameNotFoundException exception) {
+			if (Constants.DEBUG) {
+				Log.e(Constants.TAG, "getVersion", exception);
+			}
+			return "unknown";
+		}
+	}
+
+	/**
+	 * @return
+	 * @throws NameNotFoundException
+	 */
+	protected PackageInfo getPackageInfo() throws NameNotFoundException {
+		return getPackageManager().getPackageInfo(getPackageName(), 0);
 	}
 
 	/* (non-Javadoc)

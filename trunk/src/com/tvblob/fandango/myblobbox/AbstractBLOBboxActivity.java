@@ -33,9 +33,6 @@ import com.tvblob.fandango.argo.IncompatibleSoftwareVersionException;
 public abstract class AbstractBLOBboxActivity extends Activity {
 	private static final String YOUTUBE_PLAY_URL = "http://tvportal.tvblob.com/apps/youtube/app.php?vid=";
 
-	// Debugging 
-	protected static final String TAG = "BLOBbox";
-
 	private Handler handler = null;
 
 	/**
@@ -80,7 +77,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 				} catch (final Exception exception) {
 					exception.printStackTrace();
 					if (Constants.DEBUG) {
-						Log.e(TAG, "onCreate.run: " + exception.toString());
+						Log.e(Constants.TAG, "onCreate.run: " + exception.toString());
 					}
 				} finally {
 					pd.dismiss();
@@ -100,8 +97,8 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 	 */
 	void setupClientAndPerformOperation(final Intent intent) {
 		if (Constants.DEBUG) {
-			Log.i(TAG, "action: " + intent.getAction());
-			Log.i(TAG, "type: " + intent.getType());
+			Log.i(Constants.TAG, "action: " + intent.getAction());
+			Log.i(Constants.TAG, "type: " + intent.getType());
 		}
 
 		try {
@@ -121,13 +118,13 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 			exception.printStackTrace();
 			handler.sendEmptyMessage(Constants.UNSUPPORTED_INTENT);
 			if (Constants.DEBUG) {
-				Log.e(TAG, exception.toString());
+				Log.e(Constants.TAG, exception.toString());
 			}
 		} catch (final Exception e) {
 			e.printStackTrace();
 			handler.sendEmptyMessage(Constants.OPERATION_FAILED);
 			if (Constants.DEBUG) {
-				Log.e(TAG, e.toString());
+				Log.e(Constants.TAG, e.toString());
 			}
 		}
 	}
@@ -179,7 +176,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 			final Bundle extras = intent.getExtras();
 			if (extras == null) {
 				if (Constants.DEBUG) {
-					Log.i(TAG, "getURL: no data and no extras in intent "
+					Log.i(Constants.TAG, "getURL: no data and no extras in intent "
 							+ intent.toString());
 					return null;
 				}
@@ -217,7 +214,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 		 */
 		if (intent.getExtras() == null) {
 			if (Constants.DEBUG) {
-				Log.i(TAG, "No Extras, using intent type " + intent.getType());
+				Log.i(Constants.TAG, "No Extras, using intent type " + intent.getType());
 			}
 			return intent.getType();
 		}
@@ -230,7 +227,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 						MimeTypeMap.getFileExtensionFromUrl(url));
 		if (mimeTypeFromExtension != null) {
 			if (Constants.DEBUG) {
-				Log.i(TAG, "mime from map " + mimeTypeFromExtension);
+				Log.i(Constants.TAG, "mime from map " + mimeTypeFromExtension);
 			}
 			return mimeTypeFromExtension;
 		}
@@ -241,7 +238,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 		final String guessed = URLConnection.guessContentTypeFromName(url);
 		if (guessed != null) {
 			if (Constants.DEBUG) {
-				Log.i(TAG, "guessed type = " + guessed);
+				Log.i(Constants.TAG, "guessed type = " + guessed);
 			}
 			return guessed;
 		}
@@ -252,7 +249,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 		final String lastguess = url.endsWith(".torrent") ? "application/x-bittorrent"
 				: intent.getType();
 		if (Constants.DEBUG) {
-			Log.i(TAG, "couldn't guess, using mime type = " + lastguess);
+			Log.i(Constants.TAG, "couldn't guess, using mime type = " + lastguess);
 		}
 		return lastguess;
 	}
@@ -338,7 +335,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 	 */
 	public static String findVideoIDInQuery(final String query) {
 		if (Constants.DEBUG) {
-			Log.i(TAG, "findVideoIDInQuery: query = " + query);
+			Log.i(Constants.TAG, "findVideoIDInQuery: query = " + query);
 		}
 
 		final StringTokenizer tokenizer = new StringTokenizer(query, "&=");
@@ -348,7 +345,7 @@ public abstract class AbstractBLOBboxActivity extends Activity {
 					.nextToken() : "";
 
 			if (Constants.DEBUG) {
-				Log.i(TAG, "findVideoIDInQuery QUERY: " + name + "==" + value);
+				Log.i(Constants.TAG, "findVideoIDInQuery QUERY: " + name + "==" + value);
 			}
 
 			if ("v".equals(name)) {

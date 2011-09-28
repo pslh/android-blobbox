@@ -5,7 +5,7 @@ package com.tvblob.fandango.myblobbox;
  * 
  * Constants for use in multiple classes.
  * 
- * This class is not intended to be instantiated or subclassed
+ * This class is not intended to be instantiated or subclassed.
  * 
  * @author Paul Henshaw
  * @created Sep 26, 2011
@@ -13,7 +13,9 @@ package com.tvblob.fandango.myblobbox;
  */
 final class Constants {
 
+	// Debugging 
 	static final boolean DEBUG = true;
+	static final String TAG = "Blobbox Remote";
 
 	/**
 	 * PACKAGE PRIVATE operation result codes
