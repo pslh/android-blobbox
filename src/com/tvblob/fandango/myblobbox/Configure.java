@@ -1,17 +1,22 @@
 package com.tvblob.fandango.myblobbox;
 
+import java.io.IOException;
+import java.util.List;
+
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
@@ -25,6 +30,8 @@ import com.tvblob.fandango.argo.ArgoClient;
 import com.tvblob.fandango.argo.ArgoCommunicationException;
 import com.tvblob.fandango.argo.IncompatibleRemoteDeviceException;
 import com.tvblob.fandango.argo.IncompatibleSoftwareVersionException;
+import com.tvblob.fandango.ssdp.SSDP;
+import com.tvblob.fandango.ssdp.UPnPDevice;
 
 /**
  * Preferences for blobbox activities - IP address, username and password 
@@ -54,29 +61,110 @@ public class Configure extends PreferenceActivity implements
 
 		// IP address field is empty, let's prompt the user for more information about BLOBbox
 		if (ip.length() == 0) {
-			new AlertDialog.Builder(this)
-					.setTitle(R.string.what_is_blobbox)
-					.setPositiveButton(R.string.tellme,
-							new DialogInterface.OnClickListener() {
-								public void onClick(
-										final DialogInterface dialog,
-										final int whichButton) {
-									// User wants to know more about BLOBbox
-									final Uri blobboxUrl = Uri
-											.parse(BLOBBOX_URL);
-									final Intent launchBrowser = new Intent(
-											Intent.ACTION_VIEW, blobboxUrl);
-									startActivity(launchBrowser);
-								}
-							})
-					.setNegativeButton(R.string.no_thanks,
-							new DialogInterface.OnClickListener() {
-								public void onClick(
-										final DialogInterface dialog,
-										final int whichButton) {
-									// User doesn't want to be bothered, do nothing
-								}
-							}).show();
+			guessBoxIP();
+			//				showWhatIsDialog();
+		}
+	}
+
+	/**
+	 * 
+	 */
+	void showWhatIsDialog() {
+		new AlertDialog.Builder(this)
+				.setTitle(R.string.what_is_blobbox)
+				.setPositiveButton(R.string.tellme,
+						new DialogInterface.OnClickListener() {
+							public void onClick(final DialogInterface dialog,
+									final int whichButton) {
+								// User wants to know more about BLOBbox
+								final Uri blobboxUrl = Uri.parse(BLOBBOX_URL);
+								final Intent launchBrowser = new Intent(
+										Intent.ACTION_VIEW, blobboxUrl);
+								startActivity(launchBrowser);
+							}
+						})
+				.setNegativeButton(R.string.no_thanks,
+						new DialogInterface.OnClickListener() {
+							public void onClick(final DialogInterface dialog,
+									final int whichButton) {
+								// User doesn't want to be bothered, do nothing
+							}
+						}).show();
+	}
+
+	/**
+	 * @param scanHandler
+	 */
+	private void guessBoxIP() {
+		final ProgressDialog dialog = ProgressDialog.show(this,
+				getString(R.string.msg_title_progressdialog),
+				getString(R.string.scanning), true);
+
+		final Handler scanHandler = new Handler() {
+			
+			/* (non-Javadoc)
+			 * @see android.os.Handler#handleMessage(android.os.Message)
+			 */
+			public void handleMessage(final Message msg) {
+				super.handleMessage(msg);
+				switch (msg.what) {
+				case Constants.OPERATION_OK:
+					break;
+
+				case Constants.NO_DEVICE_FOUND:
+					// Intentionally fall through
+				case Constants.COMMUNICATIONS_FAILED:
+					showWhatIsDialog();
+					break;
+
+				default:
+					Log.e(Constants.TAG,
+							"guessBoxIP.handleMessage: unnexpected code: "
+									+ msg.what);
+					showWhatIsDialog();
+					break;
+				}
+			}
+		};
+
+		new Thread() {
+			public void run() {
+				scanForDevices(dialog, scanHandler);
+			}
+		}.start();
+	}
+
+	/**
+	 * @param dialog
+	 * @param scanHandler
+	 */
+	void scanForDevices(final ProgressDialog dialog, final Handler scanHandler) {
+		try {
+			final List<UPnPDevice> boxes = SSDP.findBlobboxDevices();
+			System.out.println("BOXES=" + boxes);
+			Log.d(Constants.TAG, "BOXES=" + boxes);
+			if (boxes.size() == 0) {
+				scanHandler.sendEmptyMessage(Constants.NO_DEVICE_FOUND);
+			} else {
+				/*
+				 * TODO check for > 1 box, display list or something
+				 * For now, just use first in list - most users will
+				 * have only one BLOBbox.
+				 */
+				final SharedPreferences prefs = PreferenceManager
+						.getDefaultSharedPreferences(getBaseContext());
+				final Editor edit = prefs.edit();
+				edit.putString(Constants.IP_PREF, boxes.iterator().next()
+						.getHost());
+				edit.commit();
+				scanHandler.sendEmptyMessage(Constants.OPERATION_OK);
+			}
+		} catch (final IOException exception) {
+			Log.w(Constants.TAG, "Failed to scan for BLOBbox devices");
+			exception.printStackTrace();
+			scanHandler.sendEmptyMessage(Constants.COMMUNICATIONS_FAILED);
+		} finally {
+			dialog.dismiss();
 		}
 	}
 

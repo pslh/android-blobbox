@@ -27,6 +27,7 @@ final class Constants {
 	static final int AUTHENTICATION_FAILED = 4;
 	static final int INCOMPATIBLE_DEVICE = 5;
 	static final int COMMUNICATIONS_FAILED = 6;
+	static final int NO_DEVICE_FOUND = 7;
 
 	/**
 	 * Name of IP address preference
