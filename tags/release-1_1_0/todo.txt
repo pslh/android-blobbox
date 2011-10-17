@@ -1,0 +1,18 @@
+NOW
+
+Tidy up debug code
+
+what is blobbox
+
+i18n
+
+upload source to google.code
+
+sign app
+
+create google market accounts, upload app
+
+Create and send patch for existing JSON library
+
+LATER
+ Remote control keys + text input

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Blobbox Remote</string>
+    <string name="prefs_blobbox_ip_title">Blobbox IP address</string>
+    <string name="prefs_blobbox_ip_sum">Press the TOOLS (spanner) key on the Blobbox remote control and then select Support, Diagnostics to find the IP address.</string>
+    <string name="prefs_blobbox_username_title">Username</string>
+    <string name="prefs_blobbox_username_sum">Blobbox Web Console Username.  You may leave this empty if you have not configured a username on your Blobbox.</string>
+    <string name="prefs_blobbox_password_title">Password</string>
+    <string name="prefs_blobbox_lan_category_title">LAN configuration</string>
+    <string name="prefs_blobbox_lan_category_sum">How to access the Blobbox from a local LAN</string>
+    <string name="prefs_blobbox_saved">Saved</string>
+    <string name="intent_blobbox_play">Blobbox Play</string>
+    <string name="intent_blobbox_download">Blobbox Download</string>
+    <string name="msg_errore">ERROR: </string>
+    <string name="msg_errore_toast">ERROR: Are you sure you correctly configure the parameters? Is the box available?</string>
+    <string name="msg_unsupported_intent">Sorry! we are unable to handle this content</string>
+    <string name="msg_unexpected_op_code">ERROR: unexpected operation code - please contact the authors</string>        
+    <string name="msg_title_progressdialog">Blobbox</string>
+    <string name="msg_content_progressdialog">Just one moment...</string>
+    <string name="msg_completed_ok">OK, Blobbox says "thanks"</string>
+    <string name="prefs_error_sw_ver">Blobbox software on %1$s does not support remote play API.</string>
+	<string name="prefs_error_not_blobbox">WARNING: IP %1$s is not a Blobbox. Please check IP Adress and Remote access settings on Blobbox.</string>
+	<string name="prefs_error_not_reachable">Failed to communicate with Blobbox at IP address %1$s. Please check IP Address and Remote access settings on Blobbox.</string>
+	<string name="prefs_error_auth">Authentication failure, check login and password for box on %1$s.</string>
+	<string name="prefs_ok">Blobbox found at IP %1$s.</string>
+	<string name="info_button">Info</string>
+	<string name="info_dismiss_button">Ok</string>
+	<string name="info_title">Info</string>
+	<string name="info_text">Version %1$s\n\nAuthors:\nPaul Henshaw\n   (paul.sl.henshaw@gmail.com)\nRodolfo Saccani\n   (rodolfo@saccani.net)\n\n	BLOBbox, myBlobbox, TVBLOB and the "b" logo are all registered trademarks of TVBLOB Srl.</string>
+	<string name="tellme">Tell me</string>
+	<string name="no_thanks">No thanks</string>		
+	<string name="what_is_blobbox">What is the Blobbox?</string>
+	<string name="play_title">From Blobbox Remote</string>
+	<string name="play_info">Playing %1$s from Blobbox Remote</string>
+	<string name="scanning">Searching for a BLOBbox in LAN</string>
+
+</resources>
