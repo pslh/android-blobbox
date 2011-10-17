@@ -32,5 +32,7 @@
 	<string name="what_is_blobbox">Che cos\'è la Blobbox?</string>
 	<string name="play_title">Da Blobbox Remote</string>
 	<string name="play_info">Visualizzando %1$s da Blobbox Remote</string>
+	<string name="scanning">Cercando un BLOBbox in LAN</string>
+	
 
 </resources>
