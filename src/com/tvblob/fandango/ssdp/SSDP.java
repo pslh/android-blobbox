@@ -10,12 +10,14 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Simple Service Discovery Protocol (SSDP) utility methods 
+ * Simple Service Discovery Protocol (SSDP) utility methods
+ * 
+ * @see http://en.wikipedia.org/wiki/Simple_Service_Discovery_Protocol
  * 
  * <code>
  * @author Paul Henshaw
  * @created Oct 5, 2011
- * @cvsid $Id $
+ * @cvsid $Id $ 
  * </code>
  */
 public final class SSDP {
@@ -24,11 +26,12 @@ public final class SSDP {
 	private static final String MCAST_IP = "239.255.255.250";
 	private static final int REPLY_BUF_SIZE = 1000;
 
+	// We Only want MediaRenderer v1 devices
+	// Limit max wait time to timeout
 	private static final String SEARCH = "M-SEARCH * HTTP/1.1\r\n"
 			+ "HOST:239.255.255.250:1900\r\n" + "MAN:\"ssdp:discover\"\r\n"
-			//			+ "ST:ssdp:all\r\n" +
-			+ "ST:urn:schemas-upnp-org:device:MediaRenderer:1\r\n" + // only want media renderers v1
-			"MX:" + TIMEOUT_S + "\r\n" + // max wait time == socket timeout
+			+ "ST:urn:schemas-upnp-org:device:MediaRenderer:1\r\n" +
+			"MX:" + TIMEOUT_S + "\r\n" + 
 			"\r\n";
 
 	/**
@@ -42,7 +45,7 @@ public final class SSDP {
 	/**
 	 * Scan for Blobbox devices
 	 * 
-	 * @return List of {@link UPnPDevice} 
+	 * @return List of {@link UPnPDevice}
 	 * @throws IOException
 	 */
 	public static List<UPnPDevice> findBlobboxDevices() throws IOException {
@@ -56,7 +59,7 @@ public final class SSDP {
 	}
 
 	/**
-	 * @return
+	 * @return {@link DatagramPacket}
 	 * @throws UnknownHostException
 	 */
 	private static DatagramPacket createSearchMessage()
@@ -67,7 +70,7 @@ public final class SSDP {
 
 	/**
 	 * @param msocket
-	 * @return List<String>
+	 * @return List of {@link UPnPDevice}
 	 * @throws IOException
 	 */
 	private static List<UPnPDevice> awaitReplies(final DatagramSocket msocket)
