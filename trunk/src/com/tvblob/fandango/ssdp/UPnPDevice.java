@@ -16,17 +16,18 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
- * MetaData regarding a UPnP device 
+ * MetaData regarding a UPnP device
  * 
  * <code>
+ * 
  * @author Paul Henshaw
  * @created Oct 5, 2011
- * @cvsid $Id $
- * </code>
+ * @cvsid $Id $ </code>
  */
 public class UPnPDevice {
 	private static final String BLOBBOX_PREFIX = "uuid:blobbox-";
@@ -55,21 +56,18 @@ public class UPnPDevice {
 
 	/**
 	 * @param reply
-	 * @return
+	 * @return Map String name to String value
 	 */
 	private Map<String, String> initMetaData(final String reply) {
 		/*
 		 * Example reply:
 		 * 
-		 * HTTP/1.1 200 OK
-		 * CACHE-CONTROL: max-age=1800
-		 * DATE: Wed, 05 Oct 2011 12:09:53 GMT
-		 * EXT:
-		 * LOCATION: http://192.168.1.94:49152/description.xml
-		 * SERVER: Linux/2.6.31-3.2, UPnP/1.0, Portable SDK for UPnP devices/1.4.6
-		 * X-User-Agent: redsonic
-		 * ST: urn:schemas-upnp-org:device:MediaRenderer:1
-		 * USN: uuid:blobbox-1_0-000006244034248144::urn:schemas-upnp-org:device:MediaRenderer:1
+		 * HTTP/1.1 200 OK CACHE-CONTROL: max-age=1800 DATE: Wed, 05 Oct 2011
+		 * 12:09:53 GMT EXT: LOCATION: http://192.168.1.94:49152/description.xml
+		 * SERVER: Linux/2.6.31-3.2, UPnP/1.0, Portable SDK for UPnP
+		 * devices/1.4.6 X-User-Agent: redsonic ST:
+		 * urn:schemas-upnp-org:device:MediaRenderer:1 USN: uuid:blobbox-
+		 * 1_0-000006244034248144::urn:schemas-upnp-org:device:MediaRenderer:1
 		 */
 
 		final BufferedReader reader = new BufferedReader(
@@ -132,7 +130,9 @@ public class UPnPDevice {
 	}
 
 	/**
-	 * @return
+	 * The value of the friendlyName element
+	 * 
+	 * @return String
 	 * @throws MalformedURLException
 	 * @throws IOException
 	 * @throws ParserConfigurationException
@@ -157,12 +157,13 @@ public class UPnPDevice {
 		if (nodeList.getLength() == 0) {
 			return null;
 		}
-		return nodeList.item(0).getTextContent();
+		Node firstChild = nodeList.item(0).getFirstChild();
+		return firstChild == null ? null : firstChild.getNodeValue();
 	}
 
 	/**
-	 * @return XML document for UPnP description.xml, uses cached document if 
-	 * available
+	 * @return XML document for UPnP description.xml, uses cached document if
+	 *         available
 	 * @throws IOException
 	 */
 	public Document getXMLDescription() throws IOException {
@@ -175,7 +176,7 @@ public class UPnPDevice {
 	/**
 	 * 
 	 * @return Document
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	private Document readXMLDocument() throws IOException {
 		final String url = getLocationURL();
@@ -209,7 +210,9 @@ public class UPnPDevice {
 		}
 	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see java.lang.Object#toString()
 	 */
 	public String toString() {
@@ -221,7 +224,7 @@ public class UPnPDevice {
 	}
 
 	/**
-	 * @return
+	 * @return String
 	 */
 	private String getFriendlyNameIgnoreErrors() {
 		String name;
